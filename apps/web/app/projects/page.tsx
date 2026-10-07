@@ -1,0 +1,5 @@
+import type { Metadata } from "next";
+import { PageHero, ProjectCard } from "@/components/cards";
+import { getProjects } from "@/lib/data";
+export const metadata:Metadata={title:"Projects",description:"Capstone, course, hackathon and independent software projects by Rehan Mehmood.",alternates:{canonical:"/projects"}};
+export default async function ProjectsPage({searchParams}:{searchParams:Promise<{type?:string}>}){const {type="All"}=await searchParams;const all=await getProjects();const categories=["All",...new Set(all.map(p=>p.category))];const visible=type==="All"?all:all.filter(p=>p.category===type);return <main><PageHero eyebrow="Published work" title="Projects" intro="Course projects, a capstone, a hackathon build and independent demos — each labelled for what it is."/><section className="container page-content"><nav className="filters" aria-label="Project filters">{categories.map(item=><a key={item} className={type===item?"active":""} href={item==="All"?"/projects":`/projects?type=${encodeURIComponent(item)}`}>{item}</a>)}</nav><div className="project-grid">{visible.map(p=><ProjectCard key={p.id} project={p}/>)}</div></section></main>}

@@ -1,0 +1,10 @@
+{
+  "description": "Create stunning, professional portfolio websites with complete UI/UX designs, tailored for designers seeking to showcase their work and attract clients.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

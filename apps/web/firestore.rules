@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() { return request.auth != null && request.auth.token.admin == true; }
+    match /{document=**} { allow read, write: if false; }
+    match /site/{document} { allow read, write: if isAdmin(); }
+    match /projects/{document} { allow read, write: if isAdmin(); }
+    match /services/{document} { allow read, write: if isAdmin(); }
+    match /certifications/{document} { allow read, write: if isAdmin(); }
+    match /experiences/{document} { allow read, write: if isAdmin(); }
+    match /recommendations/{document} { allow read, write: if isAdmin(); }
+    match /leads/{document} { allow read, write: if isAdmin(); }
+    match /chat_sessions/{session}/messages/{message} { allow read, write: if isAdmin(); }
+  }
+}

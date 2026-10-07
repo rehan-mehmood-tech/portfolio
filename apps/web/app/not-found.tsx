@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound(){return <main className="not-found container"><span className="mono">404 / PATH ERROR</span><h1>Page not found</h1><div className="not-found-terminal"><p><strong>guest&gt;</strong> cd /missing-page</p><p>The system cannot find the path specified.</p></div><div className="button-row"><Link className="button primary" href="/projects">View projects</Link><Link className="button secondary" href="/contact">Contact Rehan</Link></div></main>}

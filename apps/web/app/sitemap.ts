@@ -1,0 +1,4 @@
+import type { MetadataRoute } from "next";
+import { getProjects, getServices } from "@/lib/data";
+import { absoluteUrl } from "@/lib/site";
+export default async function sitemap():Promise<MetadataRoute.Sitemap>{const [projects,services]=await Promise.all([getProjects(),getServices()]);const routes=["/","/about","/projects","/services","/contact","/privacy"].map(url=>({url:absoluteUrl(url),lastModified:new Date(),changeFrequency:"monthly" as const,priority:url==="/"?1:0.8}));return [...routes,...projects.map(p=>({url:absoluteUrl(`/projects/${p.slug}`),lastModified:p.updatedAt?new Date(p.updatedAt):new Date(),changeFrequency:"monthly" as const,priority:0.7})),...services.map(s=>({url:absoluteUrl(`/services/${s.slug}`),lastModified:new Date(),changeFrequency:"monthly" as const,priority:0.7}))]}
