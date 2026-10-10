@@ -1,4 +1,4 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "./icons";
 import { ProjectVisual } from "./cards";
@@ -8,6 +8,7 @@ import Services01 from "@/components/ui/services-01";
 import TopologyField from "@/components/ui/topology-field";
 import CanvasText from "@/components/ui/canvas-text";
 import { LandingMotion } from "@/components/landing-motion";
+import { RecommendationsSection } from "@/components/recommendations-section";
 import TypewriterExample from "@/components/ui/motion-typewriter";
 
 function SectionHeader({index,label,before,pixel,after="",intro}:{index:string;label:string;before:string;pixel:string;after?:string;intro?:string}){return <div className="immersive-header reveal"><span className="pixel">{index} // {label}</span><h2>{before} <em className="pixel">{pixel}</em>{after}</h2>{intro&&<p>{intro}</p>}</div>}
@@ -123,6 +124,7 @@ export function FigmaHome({profile,projects,certifications}:{profile:SiteProfile
     <ProjectsSection projects={projects} githubUrl={profile.github}/>
     <Services01 />
     <CertificationsSection certifications={certifications}/>
+    <RecommendationsSection />
     <section className="immersive-final landing-section-divider" id="contact"><div className="wide-container"><span className="pixel final-label">07 // Let's build</span><h2>Let's build<br/><em className="pixel">something</em><br/>great.</h2><div className="final-actions"><Link href="/contact" className="button primary">Start a project <Icon name="arrow"/></Link><a href={profile.github} target="_blank" rel="noopener noreferrer" className="button secondary">View GitHub</a></div><p className="pixel">{profile.email} Â· Reply within 24 hours</p></div></section>
   </main>
 }

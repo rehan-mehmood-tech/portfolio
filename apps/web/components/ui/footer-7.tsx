@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import type { ReactElement } from "react";
 import { FaGithub, FaLinkedin, FaWhatsapp } from "react-icons/fa";
 import type { SiteProfile } from "@/lib/types";
@@ -30,6 +30,7 @@ const sections: FooterSection[] = [
     links: [
       { name: "Terms", href: "/terms" },
       { name: "Privacy Policy", href: "/privacy" },
+      { name: "Contact / Hire Me", href: "/contact" },
       { name: "Direct Email", href: "mailto:mehmoodrehan708@gmail.com" },
     ],
   },
@@ -84,8 +85,8 @@ export function Footer7({
         </div>
 
         <div className="footer-7-bottom">
-          <p>© {new Date().getFullYear()} Rehan Mehmood. All rights reserved.</p>
-          <span>{profile.location}</span>
+          <p>Ã‚Â© {new Date().getFullYear()} Rehan Mehmood. All rights reserved.</p>
+          <Link href="/login" className="footer-admin-link">Admin</Link><span className="footer-7-location">{profile.location}</span>
         </div>
       </div>
     </footer>

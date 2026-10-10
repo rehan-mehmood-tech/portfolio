@@ -4,6 +4,7 @@ export type Project = SeoFields & {
   summary: string; audience: string; problem: string; built: string; architecture: string;
   decisions: string[]; outcome: string; lessons: string; limitations: string; improvements: string;
   stack: string[]; demoUrl?: string; repositoryUrl?: string; coverImage?: string; coverAlt?: string;
+  hook?: string; features?: string[]; galleryImages?: string[]; galleryLabels?: string[];
   published: boolean; featured: boolean; sortOrder: number; status: string; serviceSlugs: string[];
   publishedAt?: string; updatedAt?: string;
 };
@@ -12,7 +13,7 @@ export type Service = SeoFields & {
   deliverables: string[]; stack: string[]; limitations: string; proofProjectSlugs: string[];
   enabled: boolean; sortOrder: number;
 };
-export type Certification = { id: string; name: string; issuer: string; date: string; credentialUrl?: string; published: boolean; sortOrder: number };
+export type Certification = { id: string; name: string; issuer: string; date: string; credentialUrl?: string; imageUrl?: string; summary?: string; skills?: string[]; published: boolean; sortOrder: number };
 export type Experience = { id: string; role: string; organization: string; location: string; startDate: string; endDate: string; summary: string; type: string; published: boolean; sortOrder: number };
 export type Recommendation = { id: string; name: string; role: string; relationship: string; quote: string; linkedinUrl?: string; permissionConfirmed: boolean; published: boolean };
 export type SiteProfile = {

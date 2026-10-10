@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import dynamic from "next/dynamic";
 import { FormEvent, useEffect, useRef, useState } from "react";
@@ -158,7 +158,7 @@ export function Terminal() {
         </div>
         <form className="terminal-input" onSubmit={(event: FormEvent) => { event.preventDefault(); void run(value); }}>
           <label className="sr-only" htmlFor="terminal-command">Ask Rehan AI Agent</label>
-          <input id="terminal-command" autoFocus value={value} onChange={(event) => setValue(event.target.value)} maxLength={1000} disabled={busy} placeholder="Ask about a project or service..." />
+          <input id="terminal-command" value={value} onChange={(event) => setValue(event.target.value)} maxLength={1000} disabled={busy} placeholder="Ask about a project or service..." />
           <button type="submit" disabled={busy || !value.trim()} aria-label="Send message"><Icon name="arrow" size={15} /></button>
         </form>
         <p className="agent-disclaimer">AI responses can be imperfect. Do not share sensitive information.</p>

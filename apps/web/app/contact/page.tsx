@@ -1,6 +1,68 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { Mail, MapPin, MessageSquare } from "lucide-react";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { ContactForm } from "@/components/contact-form";
-import { getProfile, getServices } from "@/lib/data";
-export const metadata:Metadata={title:"Contact",description:"Contact Rehan Mehmood about AI, backend, full-stack and automation work.",alternates:{canonical:"/contact"}};
-export default async function ContactPage(){const [profile,services]=await Promise.all([getProfile(),getServices()]);return <main><section className="contact-page container"><div className="contact-copy"><div className="eyebrow">Contact</div><h1>Start a project</h1><p>Tell me what you are building, where the process gets stuck and what a useful outcome looks like. I reply within 24 hours.</p><div className="direct-links"><a href={`mailto:${profile.email}`}><span><small>Email</small>{profile.email}</span></a><a href={`https://wa.me/${profile.whatsapp}`} target="_blank" rel="noopener noreferrer"><span><small>WhatsApp</small>Open click-to-chat</span></a>{profile.bookingUrl&&<a href={profile.bookingUrl}><span><small>Book a call</small>Choose a time</span></a>}</div><div className="contact-faq"><h2>What happens next?</h2>{["I review the context you send.","I reply with questions or a short call link.","You get a written scope before work starts."].map((x,i)=><div key={x}><span>0{i+1}</span><p>{x}</p></div>)}</div></div><div className="form-card"><Suspense fallback={<p>Loading form…</p>}><ContactForm services={services}/></Suspense></div></section></main>}
+import { getProfile } from "@/lib/data";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "Contact Rehan Mehmood about AI, backend, full-stack, automation work, or engineering opportunities.",
+  alternates: { canonical: "/contact" },
+};
+
+export default async function ContactPage() {
+  const profile = await getProfile();
+
+  return (
+    <main className="contact-dedicated">
+      <section className="contact-viewport">
+        <div className="contact-layout">
+          <div className="contact-details-column">
+            <header className="contact-intro">
+              <p className="contact-kicker font-pixel">LET&apos;S TALK</p>
+              <h1>Start a <span className="font-pixel">conversation.</span></h1>
+              <p>Share the project, role, or workflow you want to improve. I&apos;ll respond with a practical next step.</p>
+            </header>
+
+            <div className="contact-detail-cards">
+              <a className="contact-detail-card" href="mailto:mehmoodrehan708@gmail.com">
+                <Mail aria-hidden="true" />
+                <span><small>Email Me</small><strong>mehmoodrehan708@gmail.com</strong></span>
+                <i aria-hidden="true">â†—</i>
+              </a>
+
+              <a className="contact-detail-card" href="https://wa.me/923288514952" target="_blank" rel="noopener noreferrer">
+                <MessageSquare aria-hidden="true" />
+                <span><small>Direct Call / WhatsApp</small><strong>+92 328 8514952</strong></span>
+                <i aria-hidden="true">â†—</i>
+              </a>
+
+              <div className="contact-detail-card contact-location-card">
+                <MapPin aria-hidden="true" />
+                <span><small>Location &amp; Status</small><strong>Lahore, Pakistan (PKT / UTC+5)</strong><em>Open for Global Remote Roles</em></span>
+              </div>
+
+              <div className="contact-detail-card contact-social-card">
+                <FaGithub aria-hidden="true" />
+                <span>
+                  <small>Developer Profiles</small>
+                  <span className="contact-profile-links">
+                    <a href="https://github.com/rehan-mehmood-tech" target="_blank" rel="noopener noreferrer"><FaGithub aria-hidden="true" /> GitHub</a>
+                    <a href={profile.linkedin ?? "https://www.linkedin.com/in/rehan-mehmood"} target="_blank" rel="noopener noreferrer"><FaLinkedin aria-hidden="true" /> LinkedIn</a>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="contact-form-panel">
+            <Suspense fallback={<p className="contact-form-loading">Loading formâ€¦</p>}>
+              <ContactForm />
+            </Suspense>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}

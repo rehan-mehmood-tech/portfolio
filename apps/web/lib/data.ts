@@ -10,7 +10,7 @@ async function collectionOrFallback<K extends keyof CollectionMap>(name: K, fall
   if (!isFirebaseConfigured) return fallback;
   try {
     const snapshot = await adminDb.collection(name).get();
-    if (snapshot.empty) return fallback;
+    if (snapshot.empty) return [];
     return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as CollectionMap[K][];
   } catch (error) {
     console.error(`Firestore ${name} read failed`, error);
