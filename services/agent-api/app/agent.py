@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import json
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -92,10 +92,11 @@ def save_lead(
         "type": normalized_type,
         "name": name.strip(),
         "email": email.strip(),
+        "phone": phone.strip(),
         "service": "AI assistant enquiry",
         "budget": budget.strip() or "Not specified",
         "timeline": timeline.strip() or "Not specified",
-        "message": f"{project_summary.strip()}\nPhone/WhatsApp: {phone.strip() or 'Not provided'}",
+        "message": project_summary.strip(),
         "consent": True,
     }
     headers = {"Content-Type": "application/json"}
@@ -152,3 +153,6 @@ builder.add_edge(START, "answer")
 builder.add_conditional_edges("answer", tools_condition, {"tools": "tools", END: END})
 builder.add_edge("tools", "answer")
 graph = builder.compile(checkpointer=MemorySaver())
+
+
+

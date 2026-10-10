@@ -1,10 +1,170 @@
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb, isFirebaseConfigured } from "@/lib/firebase-admin";
-import { getCertifications, getExperiences, getProfile, getProjects, getServices } from "@/lib/data";
 import { deleteContent, saveContent, updateLeadStatus } from "../actions";
 
-export default async function AdminSection({params}:{params:Promise<{section:string}>}){const {section}=await params;if(section==="profile")return <ProfileEditor/>;if(section==="leads")return <Leads/>;if(!["projects","services","certifications","experiences"].includes(section))notFound();const items=section==="projects"?await getProjects():section==="services"?await getServices():section==="certifications"?await getCertifications():await getExperiences();return <><header><div><div className="eyebrow">Portfolio CMS</div><h1>{section}</h1></div></header>{!isFirebaseConfigured&&<p className="cms-note">Firebase credentials are not configured. Public pages use the real seed content; saving requires your Firebase environment variables.</p>}<div className="editor-layout"><div className="admin-list">{items.map(item=><div className="admin-list-row" key={item.id}><div className="list-thumb">{String("sortOrder" in item?item.sortOrder:1).padStart(2,"0")}</div><div><strong>{"title" in item?String(item.title):"name" in item?String(item.name):String(item.role)}</strong><small>{item.id}</small></div><form action={deleteContent}><input type="hidden" name="collection" value={section}/><input type="hidden" name="id" value={item.id}/><button className="text-link danger">Delete</button></form></div>)}</div><ContentEditor section={section}/></div></>}
-function ContentEditor({section}:{section:string}){if(section==="projects")return <form action={saveContent} className="editor-card admin-form-grid"><input type="hidden" name="collection" value="projects"/><h2 className="full">Add or update project</h2><Field name="id" label="Document ID" required/><Field name="slug" label="Slug" required/><Field name="title" label="Title" required/><Field name="projectType" label="Honest project label" required/><Field name="category" label="Category" required/><Field name="status" label="Status" required/><Area name="summary" label="Card summary"/><Field name="hook" label="Hook line"/><Area name="features" label="Features (one per line)"/><Area name="problem" label="Problem"/><Area name="built" label="What I built"/><Area name="architecture" label="Architecture"/><Area name="decisions" label="Decisions (one per line)"/><Area name="outcome" label="Outcome / demonstration"/><Area name="lessons" label="Lessons"/><Area name="limitations" label="Limitations"/><Area name="improvements" label="What I would improve"/><Field name="audience" label="Audience"/><Area name="stack" label="Stack (one per line)"/><Area name="serviceSlugs" label="Service slugs (one per line)"/><Field name="demoUrl" label="Demo URL"/><Field name="repositoryUrl" label="Repository URL"/><Field name="coverImage" label="Cover image URL"/><Field name="coverAlt" label="Cover image alt text"/><Area name="galleryImages" label="Gallery image URLs (one per line)"/><Area name="galleryLabels" label="Gallery labels (one per line)"/><Field name="sortOrder" label="Sort order" type="number"/><Checks names={["published","featured"]}/><button className="button primary full">Save project</button></form>;if(section==="services")return <form action={saveContent} className="editor-card admin-form-grid"><input type="hidden" name="collection" value="services"/><h2 className="full">Add or update service</h2><Field name="id" label="Document ID" required/><Field name="slug" label="Slug" required/><Field name="title" label="Title" required/><Field name="audience" label="Audience"/><Area name="description" label="Description"/><Area name="deliverables" label="Deliverables (one per line)"/><Area name="stack" label="Stack (one per line)"/><Area name="proofProjectSlugs" label="Proof project slugs (one per line)"/><Area name="limitations" label="Limitations"/><Field name="sortOrder" label="Sort order" type="number"/><Checks names={["enabled"]}/><button className="button primary full">Save service</button></form>;if(section==="certifications")return <form action={saveContent} className="editor-card admin-form-grid"><input type="hidden" name="collection" value="certifications"/><h2 className="full">Add or update certification</h2><Field name="id" label="Document ID" required/><Field name="name" label="Name" required/><Field name="issuer" label="Issuer" required/><Field name="date" label="Date"/><Field name="credentialUrl" label="Credential URL"/><Field name="imageUrl" label="Certificate image URL"/><Area name="summary" label="Credential summary"/><Area name="skills" label="Skills (one per line)"/><Field name="sortOrder" label="Sort order" type="number"/><Checks names={["published"]}/><button className="button primary full">Save certification</button></form>;return <form action={saveContent} className="editor-card admin-form-grid"><input type="hidden" name="collection" value="experiences"/><h2 className="full">Add or update experience</h2><Field name="id" label="Document ID" required/><Field name="role" label="Role" required/><Field name="organization" label="Organization" required/><Field name="location" label="Location"/><Field name="startDate" label="Start date"/><Field name="endDate" label="End date"/><Field name="type" label="Type"/><Area name="summary" label="Summary"/><Field name="sortOrder" label="Sort order" type="number"/><Checks names={["published"]}/><button className="button primary full">Save experience</button></form>}
-async function ProfileEditor(){const p=await getProfile();return <><header><div><div className="eyebrow">Portfolio CMS</div><h1>Profile</h1></div></header><div className="editor-card"><p>The profile is the single source of truth for the About page, metadata and assistant context.</p><p className="cms-note">Profile editing is intentionally guarded until Firebase is connected. Seed the initial record, then edit fields directly through the Firestore-backed profile action in the next iteration.</p><dl><dt>Name</dt><dd>{p.name}</dd><dt>Title</dt><dd>{p.title}</dd><dt>Availability</dt><dd>{p.availability}</dd><dt>Email</dt><dd>{p.email}</dd></dl></div></>}
-async function Leads(){const snap=isFirebaseConfigured?await adminDb.collection("leads").orderBy("createdAt","desc").limit(100).get():null;const leads=snap?.docs.map(d=>({id:d.id,...d.data()} as Record<string,unknown>&{id:string}))??[];return <><header><div><div className="eyebrow">Portfolio CMS</div><h1>Leads inbox</h1></div></header><div className="admin-table"><table><thead><tr><th>Lead</th><th>Source</th><th>Message</th><th>Status</th></tr></thead><tbody>{leads.map(l=><tr key={l.id}><td><strong>{String(l.name)}</strong><small>{String(l.email)}</small></td><td>{String(l.source)}</td><td>{String(l.message)}</td><td><form action={updateLeadStatus}><input type="hidden" name="id" value={l.id}/><select name="status" defaultValue={String(l.status)}>{["new","contacted","won","lost"].map(s=><option key={s}>{s}</option>)}</select><button className="button secondary small">Update</button></form></td></tr>)}</tbody></table>{leads.length===0&&<p className="cms-note">No leads yet, or Firebase is not connected.</p>}</div></>}
-function Field({name,label,required=false,type="text"}:{name:string;label:string;required?:boolean;type?:string}){return <label><span>{label}</span><input name={name} required={required} type={type}/></label>};function Area({name,label}:{name:string;label:string}){return <label className="full"><span>{label}</span><textarea name={name}/></label>};function Checks({names}:{names:string[]}){return <div className="full">{names.map(n=><label className="consent" key={n}><input type="checkbox" name={n}/><span>{n}</span></label>)}</div>}
+type AdminDocument = Record<string, unknown> & { id: string };
+
+async function getDocuments(collection: "projects" | "certifications") {
+  if (!isFirebaseConfigured) return [] as AdminDocument[];
+  const snapshot = await adminDb.collection(collection).orderBy("sortOrder", "asc").get();
+  return snapshot.docs.map((document) => ({ id: document.id, ...document.data() } as AdminDocument));
+}
+
+function value(item: AdminDocument | undefined, key: string) {
+  const current = item?.[key];
+  return typeof current === "string" || typeof current === "number" ? String(current) : "";
+}
+
+function lines(item: AdminDocument | undefined, key: string) {
+  const current = item?.[key];
+  return Array.isArray(current) ? current.map(String).join("\n") : "";
+}
+
+function checked(item: AdminDocument | undefined, key: string) {
+  return item?.[key] === true;
+}
+
+function dateLabel(timestamp: unknown) {
+  if (timestamp && typeof timestamp === "object" && "toDate" in timestamp && typeof timestamp.toDate === "function") {
+    return timestamp.toDate().toLocaleString("en-PK", { dateStyle: "medium", timeStyle: "short" });
+  }
+  if (typeof timestamp === "string" || typeof timestamp === "number") {
+    const date = new Date(timestamp);
+    if (!Number.isNaN(date.valueOf())) return date.toLocaleString("en-PK", { dateStyle: "medium", timeStyle: "short" });
+  }
+  return "Date unavailable";
+}
+
+export default async function AdminSection({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ section: string }>;
+  searchParams: Promise<{ edit?: string }>;
+}) {
+  const { section } = await params;
+  const { edit } = await searchParams;
+  if (section === "leads") return <Leads />;
+  if (section !== "projects" && section !== "certifications") notFound();
+
+  const items = await getDocuments(section);
+  const selected = edit ? items.find((item) => item.id === edit) : undefined;
+
+  return <>
+    <header><div><div className="eyebrow">Portfolio CMS</div><h1>{section === "projects" ? "Projects Management" : "Certifications Management"}</h1></div></header>
+    {!isFirebaseConfigured && <p className="cms-note" role="status">Firebase Admin credentials are not configured. Add them to <code>.env.local</code> before creating or editing records.</p>}
+    <div className="editor-layout">
+      <section className="admin-list" aria-label={"Existing " + section}>
+        <div className="admin-list-heading"><h2>Existing records</h2><span>{items.length}</span></div>
+        {items.map((item) => <article className="admin-list-row" key={item.id}>
+          <div className="list-thumb">{String(item.sortOrder ?? 999).padStart(2, "0")}</div>
+          <div><strong>{String(item.title ?? item.name ?? "Untitled")}</strong><small>{item.id} · {item.published ? "Published" : "Draft"}</small></div>
+          <div className="admin-row-actions">
+            <Link className="text-link" href={"/admin/" + section + "?edit=" + encodeURIComponent(item.id)}>Edit</Link>
+            <form action={deleteContent}>
+              <input type="hidden" name="collection" value={section} />
+              <input type="hidden" name="id" value={item.id} />
+              <button className="text-link danger" type="submit">Delete</button>
+            </form>
+          </div>
+        </article>)}
+        {items.length === 0 && <p className="cms-note">No Firestore records found.</p>}
+      </section>
+      {section === "projects" ? <ProjectEditor item={selected} /> : <CertificationEditor item={selected} />}
+    </div>
+  </>;
+}
+
+function ProjectEditor({ item }: { item?: AdminDocument }) {
+  return <form action={saveContent} className="editor-card admin-form-grid">
+    <input type="hidden" name="collection" value="projects" />
+    <div className="full admin-editor-heading"><div><span className="eyebrow">{item ? "Editing record" : "New record"}</span><h2>{item ? String(item.title) : "Add project"}</h2></div>{item && <Link className="text-link" href="/admin/projects">Cancel</Link>}</div>
+    <Field name="id" label="Document ID" defaultValue={item?.id} required readOnly={Boolean(item)} />
+    <Field name="slug" label="Slug" defaultValue={value(item, "slug")} required />
+    <Field name="title" label="Title" defaultValue={value(item, "title")} required />
+    <Field name="hook" label="Hook line" defaultValue={value(item, "hook")} />
+    <Area name="problem" label="Problem statement" defaultValue={value(item, "problem")} required />
+    <Area name="built" label="Solution statement" defaultValue={value(item, "built")} required />
+    <Area name="features" label="Features (one per line)" defaultValue={lines(item, "features")} />
+    <Area name="stack" label="Tech stack badges (one per line)" defaultValue={lines(item, "stack")} />
+    <Field name="demoUrl" label="Live URL" type="url" defaultValue={value(item, "demoUrl")} />
+    <Field name="repositoryUrl" label="GitHub repository URL" type="url" defaultValue={value(item, "repositoryUrl")} />
+    <Area name="galleryImages" label="Image / diagram URLs (one per line)" defaultValue={lines(item, "galleryImages")} />
+    <Area name="galleryLabels" label="Image / diagram labels (one per line)" defaultValue={lines(item, "galleryLabels")} />
+    <Field name="coverImage" label="Cover image URL" type="url" defaultValue={value(item, "coverImage")} />
+    <Field name="coverAlt" label="Cover image alt text" defaultValue={value(item, "coverAlt")} />
+    <Area name="summary" label="Short summary" defaultValue={value(item, "summary")} />
+    <Field name="projectType" label="Project type" defaultValue={value(item, "projectType")} />
+    <Field name="category" label="Category" defaultValue={value(item, "category")} />
+    <Field name="status" label="Status" defaultValue={value(item, "status")} />
+    <Field name="audience" label="Audience" defaultValue={value(item, "audience")} />
+    <Area name="architecture" label="Architecture" defaultValue={value(item, "architecture")} />
+    <Area name="decisions" label="Engineering decisions (one per line)" defaultValue={lines(item, "decisions")} />
+    <Area name="serviceSlugs" label="Related service slugs (one per line)" defaultValue={lines(item, "serviceSlugs")} />
+    <Area name="outcome" label="Outcome" defaultValue={value(item, "outcome")} />
+    <Area name="lessons" label="Lessons learned" defaultValue={value(item, "lessons")} />
+    <Area name="limitations" label="Limitations" defaultValue={value(item, "limitations")} />
+    <Area name="improvements" label="Next improvements" defaultValue={value(item, "improvements")} />
+    <Field name="sortOrder" label="Sort order" type="number" defaultValue={value(item, "sortOrder") || "999"} />
+    <Checks items={[["published", checked(item, "published")], ["featured", checked(item, "featured")]]} />
+    <button className="button primary full" type="submit">{item ? "Save project changes" : "Create project"}</button>
+  </form>;
+}
+
+function CertificationEditor({ item }: { item?: AdminDocument }) {
+  return <form action={saveContent} className="editor-card admin-form-grid">
+    <input type="hidden" name="collection" value="certifications" />
+    <div className="full admin-editor-heading"><div><span className="eyebrow">{item ? "Editing record" : "New record"}</span><h2>{item ? String(item.name) : "Add certification"}</h2></div>{item && <Link className="text-link" href="/admin/certifications">Cancel</Link>}</div>
+    <Field name="id" label="Document ID" defaultValue={item?.id} required readOnly={Boolean(item)} />
+    <Field name="name" label="Credential title" defaultValue={value(item, "name")} required />
+    <Field name="issuer" label="Issuing authority" defaultValue={value(item, "issuer")} required />
+    <Field name="date" label="Issue date" defaultValue={value(item, "date")} />
+    <Area name="skills" label="Skills (one per line)" defaultValue={lines(item, "skills")} />
+    <Area name="summary" label="Credential summary" defaultValue={value(item, "summary")} />
+    <Field name="imageUrl" label="Certificate image URL" type="url" defaultValue={value(item, "imageUrl")} />
+    <Field name="credentialUrl" label="Verification link" type="url" defaultValue={value(item, "credentialUrl")} />
+    <Field name="sortOrder" label="Sort order" type="number" defaultValue={value(item, "sortOrder") || "999"} />
+    <Checks items={[["published", checked(item, "published")]]} />
+    <button className="button primary full" type="submit">{item ? "Save certification changes" : "Create certification"}</button>
+  </form>;
+}
+
+async function Leads() {
+  let leads: AdminDocument[] = [];
+  if (isFirebaseConfigured) {
+    const snapshot = await adminDb.collection("leads").orderBy("createdAt", "desc").limit(100).get();
+    leads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() } as AdminDocument));
+  }
+
+  return <>
+    <header><div><div className="eyebrow">Portfolio CMS</div><h1>Incoming Leads</h1></div></header>
+    {!isFirebaseConfigured && <p className="cms-note" role="status">Firebase Admin credentials are not configured, so leads cannot be loaded.</p>}
+    <div className="admin-table admin-leads-table">
+      <table>
+        <thead><tr><th>Date</th><th>Contact</th><th>Role / source</th><th>Project details</th><th>Message brief</th><th>Status</th></tr></thead>
+        <tbody>{leads.map((lead) => <tr key={lead.id}>
+          <td>{dateLabel(lead.createdAt)}</td>
+          <td><strong>{String(lead.name ?? "Unknown")}</strong><a href={"mailto:" + String(lead.email ?? "")}>{String(lead.email ?? "No email")}</a><small>{String(lead.phone ?? lead.whatsapp ?? "No phone supplied")}</small></td>
+          <td><strong>{String(lead.type ?? "client")}</strong><small>{String(lead.source ?? "form")}</small></td>
+          <td><strong>{String(lead.service ?? "Not selected")}</strong><small>Budget: {String(lead.budget ?? "Not supplied")}</small><small>Timeline: {String(lead.timeline ?? "Not supplied")}</small></td>
+          <td className="lead-message">{String(lead.message ?? "")}</td>
+          <td><form action={updateLeadStatus} className="lead-status-form"><input type="hidden" name="id" value={lead.id} /><label className="sr-only" htmlFor={"status-" + lead.id}>Lead status</label><select id={"status-" + lead.id} name="status" defaultValue={String(lead.status ?? "new")}>{["new", "contacted", "won", "lost"].map((status) => <option key={status}>{status}</option>)}</select><button className="button primary small" type="submit">Update</button></form></td>
+        </tr>)}</tbody>
+      </table>
+      {leads.length === 0 && <p className="cms-note">No contact-form or AI-agent leads found.</p>}
+    </div>
+  </>;
+}
+
+function Field({ name, label, required = false, type = "text", defaultValue = "", readOnly = false }: { name: string; label: string; required?: boolean; type?: string; defaultValue?: string; readOnly?: boolean }) {
+  return <label><span>{label}</span><input name={name} required={required} type={type} defaultValue={defaultValue} readOnly={readOnly} /></label>;
+}
+
+function Area({ name, label, defaultValue = "", required = false }: { name: string; label: string; defaultValue?: string; required?: boolean }) {
+  return <label className="full"><span>{label}</span><textarea name={name} defaultValue={defaultValue} required={required} rows={4} /></label>;
+}
+
+function Checks({ items }: { items: [string, boolean][] }) {
+  return <div className="full admin-checks">{items.map(([name, isChecked]) => <label className="consent" key={name}><input type="checkbox" name={name} defaultChecked={isChecked} /><span>{name}</span></label>)}</div>;
+}

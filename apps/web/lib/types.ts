@@ -1,4 +1,4 @@
-export type SeoFields = { seoTitle?: string; metaDescription?: string; ogImage?: string };
+﻿export type SeoFields = { seoTitle?: string; metaDescription?: string; ogImage?: string };
 export type Project = SeoFields & {
   id: string; slug: string; title: string; projectType: string; category: string;
   summary: string; audience: string; problem: string; built: string; architecture: string;
@@ -21,4 +21,5 @@ export type SiteProfile = {
   linkedin?: string; availability: string; bio: string; positioning: string; education: string;
   cvUrl?: string; bookingUrl?: string; photoUrl: string; stack: Record<string, string>;
 };
-export type Lead = { id?: string; source: "form" | "chat"; type: "client" | "recruiter"; name: string; email: string; service?: string; budget?: string; timeline?: string; message: string; landingPage?: string; referrer?: string; utm?: Record<string, string>; status: "new" | "contacted" | "won" | "lost"; createdAt?: string };
+export type Lead = { id?: string; source: "form" | "chat"; type: "client" | "recruiter"; name: string; email: string; phone?: string; service?: string; budget?: string; timeline?: string; message: string; landingPage?: string; referrer?: string; utm?: Record<string, string>; status: "new" | "contacted" | "won" | "lost"; createdAt?: string };
+

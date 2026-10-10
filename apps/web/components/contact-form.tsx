@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { type FormEvent, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -22,6 +22,7 @@ export function ContactForm() {
       type: form.get("type"),
       name: form.get("name"),
       email: form.get("email"),
+      phone: form.get("phone") || undefined,
       service: form.get("service") || undefined,
       budget: form.get("budget") || undefined,
       timeline: form.get("timeline") || undefined,
@@ -52,7 +53,7 @@ export function ContactForm() {
     return (
       <div className="contact-success-state" role="status">
         <p className="contact-kicker font-pixel">MESSAGE RECEIVED</p>
-        <h2>Thanks—your message is in the inbox.</h2>
+        <h2>Thanksâ€”your message is in the inbox.</h2>
         <p>I&apos;ll review the details and reply within 24 hours.</p>
       </div>
     );
@@ -86,6 +87,7 @@ export function ContactForm() {
         <label htmlFor="contact-name"><span>Name *</span><input id="contact-name" name="name" autoComplete="name" required minLength={2} maxLength={100} /></label>
         <label htmlFor="contact-email"><span>Email *</span><input id="contact-email" name="email" type="email" autoComplete="email" required maxLength={200} /></label>
       </div>
+      <label htmlFor="contact-phone"><span>Phone / WhatsApp</span><input id="contact-phone" name="phone" type="tel" autoComplete="tel" maxLength={40} placeholder="Include country code" /></label>
 
       <div className="contact-field-row">
         <label htmlFor="contact-service">
@@ -107,8 +109,8 @@ export function ContactForm() {
           <select id="contact-budget" name="budget" defaultValue="">
             <option value="">Not sure yet</option>
             <option>Under $250</option>
-            <option>$250–$1,000</option>
-            <option>$1,000–$3,000</option>
+            <option>$250â€“$1,000</option>
+            <option>$1,000â€“$3,000</option>
             <option>$3,000+</option>
           </select>
         </label>
@@ -132,8 +134,9 @@ export function ContactForm() {
       <label className="sr-only" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
       {error ? <p className="contact-form-error" role="alert">{error}</p> : null}
       <button className="contact-submit-button" type="submit" disabled={state === "sending"}>
-        {state === "sending" ? "SENDING…" : "SEND MESSAGE ↗"}
+        {state === "sending" ? "SENDINGâ€¦" : "SEND MESSAGE â†—"}
       </button>
     </form>
   );
 }
+
