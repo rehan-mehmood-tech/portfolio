@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+﻿import { ArrowUpRight } from "lucide-react";
 import { Card22 } from "@/components/ui/card-22";
 import { Button } from "@/components/ui/button";
 import type { Certification, Project } from "@/lib/types";
@@ -17,7 +17,7 @@ export function ProjectsSection({ projects, githubUrl }: ProjectsSectionProps) {
   const pinnedProjects = [...featured, ...remaining].slice(0, 6);
 
   return (
-    <section className="showcase-section" id="projects">
+    <section className="showcase-section landing-section-divider" id="projects">
       <div className="showcase-container">
         <header className="showcase-heading">
           <span>Selected work</span>
@@ -43,7 +43,7 @@ export function ProjectsSection({ projects, githubUrl }: ProjectsSectionProps) {
         </div>
 
         <div className="showcase-actions">
-          <Button asChild variant="outline" size="lg">
+          <Button asChild variant="default" size="lg">
             <a href={githubUrl} target="_blank" rel="noopener noreferrer">
               View All on GitHub
               <ArrowUpRight data-icon="inline-end" aria-hidden="true" />
@@ -66,7 +66,7 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
     .slice(0, 6);
 
   return (
-    <section className="showcase-section credentials-showcase" id="certifications">
+    <section className="showcase-section credentials-showcase landing-section-divider" id="certifications">
       <div className="showcase-container">
         <header className="showcase-heading">
           <span>Verified learning</span>

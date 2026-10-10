@@ -1,0 +1,18 @@
+﻿.typewriter {
+  position: relative;
+  display: block;
+  min-height: 1.08em;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  white-space: nowrap;
+}
+.typewriter-caret {
+  display: inline-block;
+  height: .88em;
+  margin-left: .08em;
+  vertical-align: -.06em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-caret { display: none; }
+}

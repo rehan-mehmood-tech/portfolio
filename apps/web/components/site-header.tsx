@@ -14,11 +14,11 @@ type NavigationItem =
   | { label: string; href: string; external: true };
 
 const sectionLinks: NavigationItem[] = [
-  { label: "Home", href: "/#home" },
-  { label: "About", href: "/#about" },
-  { label: "Services", href: "/#services" },
-  { label: "Projects", href: "/#projects" },
-  { label: "Certifications", href: "/#certifications" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Services", href: "/services" },
+  { label: "Projects", href: "/projects" },
+  { label: "Certifications", href: "/certifications" },
 ];
 
 export function LogoMark() {
@@ -55,7 +55,7 @@ export function SiteHeader({ profile }: SiteHeaderProps) {
   return <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
     <a className="skip-link" href="#main">Skip to content</a>
     <div className="nav-inner">
-      <Link href="/#home" className="brand nav-brand-row" aria-label="Rehan Mehmood — Home" onClick={closeMenu}>
+      <Link href="/" className="brand nav-brand-row" aria-label="Rehan Mehmood — Home" onClick={closeMenu}>
         <LogoMark />
         <span className="nav-brand-name">Rehan Mehmood</span>
       </Link>

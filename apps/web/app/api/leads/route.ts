@@ -1,10 +1,89 @@
-import { createHash, randomUUID } from "node:crypto";
+﻿import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb, isFirebaseConfigured } from "@/lib/firebase-admin";
 import { leadSchema } from "@/lib/schemas";
 
-const attempts=new Map<string,{count:number;reset:number}>();
-function allowed(ip:string){const now=Date.now();const current=attempts.get(ip);if(!current||current.reset<now){attempts.set(ip,{count:1,reset:now+10*60_000});return true}if(current.count>=5)return false;current.count+=1;return true}
-async function notify(name:string,email:string,message:string){const text=`New portfolio lead\n${name}\n${email}\n${message.slice(0,500)}`;if(process.env.TELEGRAM_BOT_TOKEN&&process.env.TELEGRAM_CHAT_ID)await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:process.env.TELEGRAM_CHAT_ID,text})});if(process.env.RESEND_API_KEY&&process.env.LEAD_NOTIFICATION_EMAIL)await fetch("https://api.resend.com/emails",{method:"POST",headers:{Authorization:`Bearer ${process.env.RESEND_API_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({from:"Portfolio <onboarding@resend.dev>",to:[process.env.LEAD_NOTIFICATION_EMAIL],subject:`New lead from ${name}`,text})})}
-export async function POST(request:NextRequest){const ip=request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()??"unknown";if(!allowed(ip))return NextResponse.json({error:"Too many submissions. Please try again later."},{status:429});let body:unknown;try{body=await request.json()}catch{return NextResponse.json({error:"Invalid request."},{status:400})}const result=leadSchema.safeParse(body);if(!result.success)return NextResponse.json({error:"Please check the required fields.",details:result.error.flatten().fieldErrors},{status:422});if(result.data.website)return NextResponse.json({ok:true});if(!isFirebaseConfigured)return NextResponse.json({error:"Lead storage is not configured yet. Please email Rehan directly."},{status:503});const {consent,website,...lead}=result.data;const id=randomUUID();await adminDb.collection("leads").doc(id).set({...lead,status:"new",ipHash:createHash("sha256").update(`${process.env.INTERNAL_API_KEY??"local"}:${ip}`).digest("hex"),consentAt:FieldValue.serverTimestamp(),createdAt:FieldValue.serverTimestamp()});await notify(lead.name,lead.email,lead.message).catch(error=>console.error("Lead notification failed",error));return NextResponse.json({ok:true,id},{status:201})}
+const attempts = new Map<string, { count: number; reset: number }>();
+
+function allowed(ip: string) {
+  const now = Date.now();
+  const current = attempts.get(ip);
+  if (!current || current.reset < now) {
+    attempts.set(ip, { count: 1, reset: now + 10 * 60_000 });
+    return true;
+  }
+  if (current.count >= 5) return false;
+  current.count += 1;
+  return true;
+}
+
+function validInternalKey(request: NextRequest) {
+  const expected = process.env.INTERNAL_API_KEY;
+  if (!expected) return true;
+  const received = request.headers.get("x-internal-key") ?? "";
+  const expectedBuffer = Buffer.from(expected);
+  const receivedBuffer = Buffer.from(received);
+  return expectedBuffer.length === receivedBuffer.length && timingSafeEqual(expectedBuffer, receivedBuffer);
+}
+
+async function notify(name: string, email: string, message: string) {
+  const text = `New portfolio lead\n${name}\n${email}\n${message.slice(0, 500)}`;
+  const notifications: Promise<Response>[] = [];
+  if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+    notifications.push(fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text }),
+    }));
+  }
+  if (process.env.RESEND_API_KEY && process.env.LEAD_NOTIFICATION_EMAIL) {
+    notifications.push(fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: "Portfolio <onboarding@resend.dev>",
+        to: [process.env.LEAD_NOTIFICATION_EMAIL],
+        subject: `New lead from ${name}`,
+        text,
+      }),
+    }));
+  }
+  await Promise.allSettled(notifications);
+}
+
+export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (!allowed(ip)) return NextResponse.json({ error: "Too many submissions. Please try again later." }, { status: 429 });
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
+
+  const result = leadSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json({ error: "Please check the required fields.", details: result.error.flatten().fieldErrors }, { status: 422 });
+  }
+  if (result.data.source === "chat" && !validInternalKey(request)) {
+    return NextResponse.json({ error: "Unauthorized agent request." }, { status: 401 });
+  }
+  if (result.data.website) return NextResponse.json({ ok: true });
+  if (!isFirebaseConfigured) {
+    return NextResponse.json({ error: "Lead storage is not configured yet. Please email Rehan directly." }, { status: 503 });
+  }
+
+  const { consent: _consent, website: _website, ...lead } = result.data;
+  const id = randomUUID();
+  await adminDb.collection("leads").doc(id).set({
+    ...lead,
+    status: "new",
+    ipHash: createHash("sha256").update(`${process.env.INTERNAL_API_KEY ?? "local"}:${ip}`).digest("hex"),
+    consentAt: FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  await notify(lead.name, lead.email, lead.message).catch((error) => console.error("Lead notification failed", error));
+  return NextResponse.json({ ok: true, id }, { status: 201 });
+}

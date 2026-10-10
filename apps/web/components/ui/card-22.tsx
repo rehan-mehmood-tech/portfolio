@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
@@ -75,14 +75,14 @@ export function Card22({
 
       <CardFooter>
         {actionHref ? (
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="default" size="sm">
             <a href={actionHref} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined}>
               {actionLabel}
               <ArrowUpRight data-icon="inline-end" aria-hidden="true" />
             </a>
           </Button>
         ) : (
-          <Button variant="outline" size="sm" disabled aria-label={actionLabel + " unavailable"}>
+          <Button variant="default" size="sm" disabled aria-label={actionLabel + " unavailable"}>
             {actionLabel}
             <ArrowUpRight data-icon="inline-end" aria-hidden="true" />
           </Button>

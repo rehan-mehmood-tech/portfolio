@@ -1,4 +1,6 @@
-import Link from "next/link";
-import type { SiteProfile } from "@/lib/types";
-import { LogoMark } from "./site-header";
-export function SiteFooter({profile}:{profile:SiteProfile}){return <footer><div className="container footer-grid"><div><Link href="/" className="brand"><LogoMark/><span>{profile.name}</span></Link><p>AI agents, automations and the backend APIs behind them.</p><span className="muted">{profile.location}</span></div><div><strong>Pages</strong><Link href="/projects">Projects</Link><Link href="/services">Services</Link><Link href="/about">About</Link><Link href="/contact">Contact</Link></div><div><strong>Connect</strong><a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub</a>{profile.linkedin&&<a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>}<a href={`mailto:${profile.email}`}>Email</a><a href={`https://wa.me/${profile.whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp</a></div><div><strong>Built with</strong><p className="mono">Next.js · FastAPI · LangGraph · Firebase</p></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Rehan Mehmood</span><Link href="/privacy">Privacy</Link></div></footer>}
+﻿import type { SiteProfile } from "@/lib/types";
+import { Footer7 } from "@/components/ui/footer-7";
+
+export function SiteFooter({ profile }: { profile: SiteProfile }) {
+  return <Footer7 profile={profile} />;
+}
