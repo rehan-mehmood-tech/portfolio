@@ -30,32 +30,32 @@ function RobotModel() {
 
   return <group ref={groupRef} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} scale={.88}>
     <RoundedBox args={[1.46, 1.18, .94]} radius={.26} smoothness={5} position={[0, .43, 0]} castShadow>
-      <meshStandardMaterial color="#121212" roughness={.86} metalness={.08} />
+      <meshStandardMaterial color="#f3f4f6" roughness={.78} metalness={.06} />
     </RoundedBox>
     <RoundedBox args={[1.16, .76, .08]} radius={.17} smoothness={5} position={[0, .45, .495]}>
       <meshStandardMaterial color="#030303" roughness={.2} metalness={.34} />
     </RoundedBox>
     <RoundedBox args={[.2, .2, .055]} radius={.025} smoothness={3} position={[-.27, .47, .55]}>
-      <meshStandardMaterial color="#fff" emissive="#fff" emissiveIntensity={4.4} toneMapped={false} />
+      <meshStandardMaterial color="#ef233c" emissive="#ef233c" emissiveIntensity={.9} toneMapped={false} />
     </RoundedBox>
     <RoundedBox args={[.2, .2, .055]} radius={.025} smoothness={3} position={[.27, .47, .55]}>
-      <meshStandardMaterial color="#fff" emissive="#fff" emissiveIntensity={4.4} toneMapped={false} />
+      <meshStandardMaterial color="#ef233c" emissive="#ef233c" emissiveIntensity={.9} toneMapped={false} />
     </RoundedBox>
 
     <RoundedBox args={[.78, .78, .62]} radius={.22} smoothness={5} position={[0, -.63, -.02]} castShadow>
-      <meshStandardMaterial color="#101010" roughness={.92} metalness={.04} />
+      <meshStandardMaterial color="#f3f4f6" roughness={.86} metalness={.04} />
     </RoundedBox>
     <RoundedBox args={[.22, .56, .25]} radius={.1} smoothness={4} position={[-.49, -.58, 0]} rotation={[0, 0, -.08]} castShadow>
-      <meshStandardMaterial color="#151515" roughness={.9} />
+      <meshStandardMaterial color="#e5e7eb" roughness={.88} />
     </RoundedBox>
     <RoundedBox args={[.22, .56, .25]} radius={.1} smoothness={4} position={[.49, -.58, 0]} rotation={[0, 0, .08]} castShadow>
-      <meshStandardMaterial color="#151515" roughness={.9} />
+      <meshStandardMaterial color="#e5e7eb" roughness={.88} />
     </RoundedBox>
     <RoundedBox args={[.3, .42, .34]} radius={.12} smoothness={4} position={[-.22, -1.15, .02]} castShadow>
-      <meshStandardMaterial color="#0d0d0d" roughness={.94} />
+      <meshStandardMaterial color="#dfe3e8" roughness={.9} />
     </RoundedBox>
     <RoundedBox args={[.3, .42, .34]} radius={.12} smoothness={4} position={[.22, -1.15, .02]} castShadow>
-      <meshStandardMaterial color="#0d0d0d" roughness={.94} />
+      <meshStandardMaterial color="#dfe3e8" roughness={.9} />
     </RoundedBox>
   </group>;
 }

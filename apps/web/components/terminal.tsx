@@ -117,7 +117,7 @@ export function Terminal() {
   if (!open) {
     return <>
       <RobotAvatar onActivate={() => setOpen(true)} />
-      <button ref={triggerRef} className="terminal-launcher" onClick={() => setOpen(true)}><span>&gt;_ ask rehan&apos;s agent</span><i>▍</i></button>
+      <button ref={triggerRef} className="terminal-launcher" onClick={() => setOpen(true)} aria-label="Talk to my AI"><span className="terminal-launcher-copy">Talk to my AI</span><i aria-hidden="true">▍</i></button>
     </>;
   }
 
