@@ -1,10 +1,13 @@
 ﻿"use client";
 
+import dynamic from "next/dynamic";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Icon } from "./icons";
 
 type Line = { kind: "system" | "user" | "agent"; text: string };
 type AgentEvent = { t: string } | { code: string; message: string } | { message_id: string };
+
+const RobotAvatar = dynamic(() => import("./robot-avatar").then((module) => module.RobotAvatar), { ssr: false });
 
 const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_API_URL ?? "http://localhost:8000";
 const SESSION_KEY = "rehan_agent_session";
@@ -112,7 +115,10 @@ export function Terminal() {
   }
 
   if (!open) {
-    return <button ref={triggerRef} className="terminal-launcher" onClick={() => setOpen(true)}><span>&gt;_ ask rehan&apos;s agent</span><i>▍</i></button>;
+    return <>
+      <RobotAvatar onActivate={() => setOpen(true)} />
+      <button ref={triggerRef} className="terminal-launcher" onClick={() => setOpen(true)}><span>&gt;_ ask rehan&apos;s agent</span><i>▍</i></button>
+    </>;
   }
 
   return <div className={`terminal-window ${maximized ? "maximized" : ""}`} role="dialog" aria-modal="true" aria-label="Rehan's AI assistant">
@@ -122,3 +128,5 @@ export function Terminal() {
     <form className="terminal-input" onSubmit={(event: FormEvent) => { event.preventDefault(); void run(value); }}><label htmlFor="terminal-command">guest&gt;</label><input id="terminal-command" autoFocus value={value} onChange={(event) => setValue(event.target.value)} maxLength={1000} disabled={busy} /><span>▍</span></form>
   </div>;
 }
+
+
